@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tender Document Package Builder</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <h1 id="appTitle">Tender Document Package Builder</h1>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" id="langEn" class="lang-btn active" data-lang="en">English</button>
+      <button type="button" id="langBn" class="lang-btn" data-lang="bn">বাংলা</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="restoreBanner" class="banner info" hidden></div>
+  <div id="globalMsg" class="banner" role="alert" aria-live="assertive" hidden></div>
+
+  <!-- STEP 1 -->
+  <section class="card" id="step1">
+    <h2><span class="num">1</span><span data-i18n="step1">Open the tender requirements</span></h2>
+    <div class="drop" id="reqDrop">
+      <p data-i18n="reqHint">Drag requirements.json here, or click the button.</p>
+      <label class="btn primary" for="reqInput" data-i18n="reqBtn">Open requirements.json</label>
+      <input type="file" id="reqInput" accept=".json,application/json" hidden>
+    </div>
+    <div id="tenderInfo" hidden></div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card" id="step2">
+    <h2><span class="num">2</span><span data-i18n="step2">Upload your PDF files</span></h2>
+    <div class="drop" id="pdfDrop">
+      <p data-i18n="pdfHint">Drag PDF files here, or click the button. You can choose many files at once.</p>
+      <label class="btn primary" for="pdfInput" data-i18n="pdfBtn">Choose PDF files</label>
+      <input type="file" id="pdfInput" accept=".pdf,application/pdf" multiple hidden>
+      <p class="muted small" data-i18n="pdfLimits">Only PDF files. Up to 30 files and 50 MB in total.</p>
+    </div>
+    <div id="uploadMsgs" aria-live="polite"></div>
+    <div id="dupWarn" class="banner warn" hidden></div>
+    <div id="fileList"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card" id="step3">
+    <h2><span class="num">3</span><span data-i18n="step3">Match files and enter expiry dates</span></h2>
+    <div class="toolbar">
+      <button type="button" class="btn" id="autoMatchBtn" data-i18n="autoMatch">Suggest matches from file names</button>
+      <button type="button" class="btn" id="clearMatchBtn" data-i18n="clearMatches">Undo all matches</button>
+    </div>
+    <p class="muted small" id="matchHelp" data-i18n="matchHelp">For each document, choose the file that belongs to it. Each file can be used once.</p>
+    <div id="checklist"></div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card" id="step4">
+    <h2><span class="num">4</span><span data-i18n="step4">Check and create the package</span></h2>
+    <div id="summary" aria-live="polite"></div>
+
+    <details class="options" id="optDetails">
+      <summary data-i18n="optTitle">Extra options (optional)</summary>
+      <div class="opt-body">
+        <label class="check"><input type="checkbox" id="optIndex"> <span data-i18n="optIndex">Add an index page after the cover (shows where each document starts)</span></label>
+
+        <fieldset class="seal">
+          <legend data-i18n="sealTitle">Seal or signature (optional)</legend>
+          <p class="muted small" data-i18n="sealHelp">Upload a PNG image and choose the pages where it should appear.</p>
+          <div class="row">
+            <label class="btn" for="sealInput" data-i18n="sealBtn">Choose PNG image</label>
+            <input type="file" id="sealInput" accept="image/png,.png" hidden>
+            <span id="sealName" class="muted small"></span>
+            <button type="button" class="btn small-btn" id="sealRemove" hidden data-i18n="sealRemove">Remove image</button>
+          </div>
+          <div id="sealOpts" hidden>
+            <div class="grid2">
+              <label><span data-i18n="sealPages">Package pages (e.g. 1, 3-5 or all)</span>
+                <input type="text" id="sealPages" placeholder="all"></label>
+              <label><span data-i18n="sealPos">Position</span>
+                <select id="sealPos">
+                  <option value="br" data-i18n="posBR">Bottom right</option>
+                  <option value="bl" data-i18n="posBL">Bottom left</option>
+                  <option value="bc" data-i18n="posBC">Bottom center</option>
+                  <option value="tr" data-i18n="posTR">Top right</option>
+                  <option value="tl" data-i18n="posTL">Top left</option>
+                  <option value="cc" data-i18n="posCC">Center</option>
+                </select></label>
+              <label><span data-i18n="sealSize">Size (% of page width)</span>
+                <input type="range" id="sealSize" min="8" max="40" value="18"> <output id="sealSizeOut">18</output>%</label>
+            </div>
+            <button type="button" class="btn small-btn" id="sealFirstPages" data-i18n="sealFirst">Use the first page of every document</button>
+            <div id="sealMsg" class="small err"></div>
+          </div>
+        </fieldset>
+      </div>
+    </details>
+
+    <div class="gen-row">
+      <button type="button" class="btn big primary" id="generateBtn" disabled data-i18n="generate">Generate package</button>
+      <a class="btn big success" id="downloadBtn" hidden data-i18n="download">Download package</a>
+      <a class="btn" id="previewBtn" target="_blank" rel="noopener" hidden data-i18n="previewPkg">Open preview</a>
+      <button type="button" class="btn" id="csvBtn" data-i18n="exportCsv">Export checklist (CSV / Excel)</button>
+    </div>
+    <div id="genMsg" aria-live="polite"></div>
+  </section>
+
+  <section class="card" id="saveCard">
+    <h2><span class="num">★</span><span data-i18n="saveTitle">Your work</span></h2>
+    <p class="muted small" data-i18n="saveHelp">Your files and choices are saved in this browser only. Nothing is uploaded anywhere.</p>
+    <button type="button" class="btn danger" id="resetBtn" data-i18n="reset">Start over (clear everything)</button>
+  </section>
+</main>
+
+<!-- Preview modal -->
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <strong id="modalTitle"></strong>
+      <button type="button" class="btn" id="modalClose" data-i18n="close">Close</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="vendor/pdf-lib.min.js"></script>
+<script src="vendor/pdf.min.js"></script>
+<script src="i18n.js"></script>
+<script src="pkg.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
