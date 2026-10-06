@@ -36,7 +36,6 @@ npm run dev
 ```
 
 Open **http://localhost:8080** in Chrome.
-If the port is busy: `PORT=3000 npm run dev` and open http://localhost:3000.
 (`npm install` downloads nothing: all libraries are already bundled in `vendor/`. You can also just double-click `index.html`.)
 
 **To test with the sample pack:** upload `sample-pack/requirements.json` in Step 1, then all files from `sample-pack/documents/` in Step 2.
